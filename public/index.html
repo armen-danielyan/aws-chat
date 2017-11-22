@@ -30,7 +30,7 @@ or in the "license" file accompanying this file. This file is distributed on an 
                         </div>
                     </div>
                     <div class="row members-body" v-cloak>
-                        <ul class="list-group members-group">
+                        <ul id="members" class="list-group members-group">
                             <li class="list-group-item member-item justify-content-between bg-faded" v-for="(value, key) in members">
                                 <img v-bind:src="value.avatar" class="rounded-circle mr-1">
                                 <small> {{ value.username }}</small>
@@ -47,11 +47,7 @@ or in the "license" file accompanying this file. This file is distributed on an 
                     <div class="row messages-body" v-cloak>
                         <div class="col-sm-12">
                             <ul id="messages" class="list-group message-group">
-                                <li class="list-group-item message-item d-flex" v-for="message in messages" track-by="$index">
-                                    <img v-bind:src="message.avatar" class="rounded-circle float-left mr-2"> {{ message.message }}
-                                    <hr>
-                                    <small class="text-muted">{{ message.username }} @ {{ formatMessageDate(message.date) }}</small>
-                                </li>
+
                             </ul>
                         </div>
                     </div>
@@ -92,6 +88,31 @@ or in the "license" file accompanying this file. This file is distributed on an 
             send();
         });
 
+        socket.on('messages', function(msgs) {
+            messages.push(msgs);
+            setMessages(messages);
+        });
+
+        socket.on('message_history', function(msgs) {
+            messages = msgs;
+            setMessages(messages);
+        });
+
+        socket.on('member_add', function(member) {
+            members[member.socket] = member;
+            setMembers(members);
+        });
+
+        socket.on('member_delete', function(socket_id) {
+            delete members[socket_id];
+            setMembers(members);
+        });
+
+        socket.on('member_history', function(mms) {
+            members = mms;
+            setMembers(members);
+        });
+
         function send() {
             message = inputMessage.val();
             socket.emit('send', message);
@@ -107,16 +128,6 @@ or in the "license" file accompanying this file. This file is distributed on an 
             return moment(date).format("h:mm:ss a");
         }
 
-        socket.on('messages', function(msgs) {
-            messages.push(msgs);
-            setMessages(messages);
-        });
-
-        socket.on('message_history', function(msgs) {
-            messages = msgs;
-            setMessages(messages);
-        });
-
         function setMessages(msgs) {
             var msgItem = '';
             $.each(msgs, function(key, message) {
@@ -128,6 +139,19 @@ or in the "license" file accompanying this file. This file is distributed on an 
             });
 
             $("#messages").html(msgItem);
+        }
+
+        function setMembers(mms) {
+
+            var mmsItem = '';
+            $.each(mms, function(key, member) {
+                mmsItem += '<li class="list-group-item member-item justify-content-between bg-faded">';
+                mmsItem += '<img src="' + member.avatar + '" class="rounded-circle mr-1">';
+                mmsItem += '<small>' + member.username + '</small>';
+                mmsItem += '</li>';
+            });
+
+            $("#members").html(mmsItem);
         }
 
         /*new Vue({
