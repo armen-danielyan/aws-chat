@@ -31,10 +31,7 @@ or in the "license" file accompanying this file. This file is distributed on an 
                     </div>
                     <div class="row members-body" v-cloak>
                         <ul id="members" class="list-group members-group">
-                            <li class="list-group-item member-item justify-content-between bg-faded" v-for="(value, key) in members">
-                                <img v-bind:src="value.avatar" class="rounded-circle mr-1">
-                                <small> {{ value.username }}</small>
-                            </li>
+
                         </ul>
                     </div>
                 </nav>
@@ -132,7 +129,6 @@ or in the "license" file accompanying this file. This file is distributed on an 
             var msgItem = '';
             $.each(msgs, function(key, message) {
                 msgItem += '<li class="list-group-item message-item d-flex" track-by="$index">';
-                msgItem += '<img src="' + message.avatar + '" class="rounded-circle float-left mr-2"> ' + message.message;
                 msgItem += '<hr>';
                 msgItem += '<small class="text-muted">' + message.username + ' @ ' + formatMessageDate(message.date) + '</small>';
                 msgItem += '</li>';
@@ -146,7 +142,6 @@ or in the "license" file accompanying this file. This file is distributed on an 
             var mmsItem = '';
             $.each(mms, function(key, member) {
                 mmsItem += '<li class="list-group-item member-item justify-content-between bg-faded">';
-                mmsItem += '<img src="' + member.avatar + '" class="rounded-circle mr-1">';
                 mmsItem += '<small>' + member.username + '</small>';
                 mmsItem += '</li>';
             });
