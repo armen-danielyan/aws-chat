@@ -4,7 +4,6 @@ var message = '',
     members = {};
 
 var inputMessage = $('#message');
-var msgsWrap = $('#messages-wrap');
 
 inputMessage.on('keypress', function(e) {
     if(e.which === 13){
@@ -63,18 +62,23 @@ function setMessages(msgs) {
     });
 
     $("#messages").html(msgItem);
-
-    msgsWrap.scrollTop(msgsWrap.scrollHeight);
 }
 
 function setMembers(mms) {
-
-    var mmsItem = '';
-    $.each(mms, function(key, member) {
-        mmsItem += '<li class="list-group-item member-item justify-content-between bg-faded">';
-        mmsItem += '<small>' + member.username + '</small>';
-        mmsItem += '</li>';
+    var membersWrap = $('</ul>', {
+        id: 'members',
+        class: 'list-group members-group'
     });
 
-    $("#members").html(mmsItem);
+    $.each(mms, function(key, member) {
+        var memberItem = $('</li>', {
+            class: 'list-group-item member-item justify-content-between bg-faded'
+        }).appendTo(membersWrap);
+
+        $('</small>', {
+            text: member.username
+        }).appendTo(memberItem);
+    });
+
+    $("#members-wrap").html(mmsItem);
 }
