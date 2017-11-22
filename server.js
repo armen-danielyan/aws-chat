@@ -8,7 +8,7 @@ var io = require('socket.io')(http);
 var port = process.env.PORT || 3000;
 
 var Redis = require('ioredis');
-var redis_address = process.env.REDIS_ADDRESS || 'smarttelemed.mfcuqk.ng.0001.use2.cache.amazonaws.com:6379';
+var redis_address = 'redis://telemed.mfcuqk.ng.0001.use2.cache.amazonaws.com:6379';
 
 var redis = new Redis(redis_address);
 var redis_subscribers = {};
