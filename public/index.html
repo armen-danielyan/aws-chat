@@ -84,21 +84,21 @@ or in the "license" file accompanying this file. This file is distributed on an 
 
         inputMessage.on('keypress', function(e) {
             if(e.which === 13){
-                console.log(message);
                 send();
             }
         });
 
         $('#send').on('click', function() {
-            console.log(message);
             send();
         });
 
         function send() {
             message = inputMessage.val();
+            console.log(message);
             socket.emit('send', message);
             message = '';
             inputMessage.val('');
+            console.log(message);
         }
 
         /*new Vue({
