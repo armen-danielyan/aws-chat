@@ -84,14 +84,14 @@ or in the "license" file accompanying this file. This file is distributed on an 
 
         inputMessage.on('keypress', function(e) {
             if(e.which === 13){
-                send();
                 console.log(message);
+                send();
             }
         });
 
         $('#send').on('click', function() {
-            send();
             console.log(message);
+            send();
         });
 
         function send() {
