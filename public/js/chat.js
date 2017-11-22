@@ -1,41 +1,42 @@
-var socket = io();
-var message = '',
+let socket = io();
+
+let message = '',
     messages = [],
     members = {};
 
-var inputMessage = $('#message');
+let inputMessage = $('#message');
 
-inputMessage.on('keypress', function(e) {
+inputMessage.on('keypress', e => {
     if(e.which === 13){
         send();
     }
 });
 
-$('#send').on('click', function() {
+$('#send').on('click', () => {
     send();
 });
 
-socket.on('messages', function(msgs) {
+socket.on('messages', msgs => {
     messages.push(msgs);
     setMessages(messages);
 });
 
-socket.on('message_history', function(msgs) {
+socket.on('message_history', msgs => {
     messages = msgs;
     setMessages(messages);
 });
 
-socket.on('member_add', function(member) {
+socket.on('member_add', member => {
     members[member.socket] = member;
     setMembers(members);
 });
 
-socket.on('member_delete', function(socket_id) {
+socket.on('member_delete', socket_id => {
     delete members[socket_id];
     setMembers(members);
 });
 
-socket.on('member_history', function(mms) {
+socket.on('member_history', mms => {
     members = mms;
     setMembers(members);
 });
@@ -52,8 +53,8 @@ function formatMessageDate(date) {
 }
 
 function setMessages(msgs) {
-    var msgItem = '';
-    $.each(msgs, function(key, message) {
+    let msgItem = '';
+    $.each(msgs, (key, message) => {
         msgItem += '<li class="list-group-item message-item d-flex">';
         msgItem += message.message;
         msgItem += '<hr>';
@@ -65,20 +66,12 @@ function setMessages(msgs) {
 }
 
 function setMembers(mms) {
-    var membersWrap = $('</ul>', {
-        id: 'members',
-        class: 'list-group members-group'
+    let mmsItem = '';
+    $.each(mms, (key, member) => {
+        mmsItem += '<li class="list-group-item member-item justify-content-between bg-faded">';
+        mmsItem += '<small>' + member.username + '</small>';
+        mmsItem += '</li>';
     });
 
-    $.each(mms, function(key, member) {
-        var memberItem = $('</li>', {
-            class: 'list-group-item member-item justify-content-between bg-faded'
-        }).appendTo(membersWrap);
-
-        $('</small>', {
-            text: member.username
-        }).appendTo(memberItem);
-    });
-
-    $("#members-wrap").html(membersWrap);
+    $("#members").html(mmsItem);
 }
