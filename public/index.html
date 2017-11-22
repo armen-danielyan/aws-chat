@@ -46,7 +46,7 @@ or in the "license" file accompanying this file. This file is distributed on an 
                     </div>
                     <div class="row messages-body" v-cloak>
                         <div class="col-sm-12">
-                            <ul class="list-group message-group">
+                            <ul id="messages" class="list-group message-group">
                                 <li class="list-group-item message-item d-flex" v-for="message in messages" track-by="$index">
                                     <img v-bind:src="message.avatar" class="rounded-circle float-left mr-2"> {{ message.message }}
                                     <hr>
@@ -94,11 +94,40 @@ or in the "license" file accompanying this file. This file is distributed on an 
 
         function send() {
             message = inputMessage.val();
-            console.log(message);
             socket.emit('send', message);
             message = '';
             inputMessage.val('');
-            console.log(message);
+        }
+
+        function formatMemberDate(date) {
+            return moment(date).format("h:mm:ss a");
+        }
+
+        function formatMessageDate(date) {
+            return moment(date).format("h:mm:ss a");
+        }
+
+        socket.on('messages', function(msgs) {
+            messages.push(msgs);
+            setMessages(messages);
+        });
+
+        socket.on('message_history', function(msgs) {
+            messages = msgs;
+            setMessages(messages);
+        });
+
+        function setMessages(msgs) {
+            var msgItem = '';
+            $.each(msgs, function(key, message) {
+                msgItem += '<li class="list-group-item message-item d-flex" track-by="$index">';
+                msgItem += '<img src="' + message.avatar + '" class="rounded-circle float-left mr-2"> ' + message.message;
+                msgItem += '<hr>';
+                msgItem += '<small class="text-muted">' + message.username + ' @ ' + formatMessageDate(message.date) + '</small>';
+                msgItem += '</li>';
+            });
+
+            $("#messages").html(msgItem);
         }
 
         /*new Vue({
