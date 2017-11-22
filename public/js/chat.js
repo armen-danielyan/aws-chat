@@ -80,5 +80,5 @@ function setMembers(mms) {
         }).appendTo(memberItem);
     });
 
-    $("#members-wrap").html(mmsItem);
+    $("#members-wrap").html(membersWrap);
 }
