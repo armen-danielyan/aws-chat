@@ -12,29 +12,8 @@
     border-right: 1px solid #eee;
 }
 
-.members-header {
-    background-color: #F5EDCD;
-    color: #545456;
-    font-size: 1.25rem;
-    padding-top: .25rem;
-    padding-bottom: .25rem;
-}
-
-.meessage-avatar {
-    float: left;
-    margin: 0px 15px 15px 0px;
-}
-
 .members-group {
     width: 100%;
-}
-
-.messages-header {
-    background-color: #EAF0E8;
-    color: #545456;
-    font-size: 1.25rem;
-    padding-top: .25rem;
-    padding-bottom: .25rem;
 }
 
 .messages-main {
@@ -59,8 +38,9 @@
     border-bottom: 1px solid #ddd;
 
 }
+
 .list-group-item:first-child {
     border-top: none;
-    border-top-left-radius: 0px;
-    border-top-right-radius: 0px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }
