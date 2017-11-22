@@ -82,11 +82,6 @@ or in the "license" file accompanying this file. This file is distributed on an 
 
         var inputMessage = $('#message');
 
-        inputMessage.on('change', function() {
-            message = inputMessage.val();
-            console.log(message);
-        });
-
         inputMessage.on('keypress', function(e) {
             if(e.which === 13){
                 send();
@@ -100,8 +95,10 @@ or in the "license" file accompanying this file. This file is distributed on an 
         });
 
         function send() {
+            message = inputMessage.val();
             socket.emit('send', message);
             message = '';
+            inputMessage.val(message);
         }
 
         /*new Vue({
