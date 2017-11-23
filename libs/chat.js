@@ -9,8 +9,7 @@ const sockets = http => {
 
     let redisAddress = config.get('redis').address,
         redis = new Redis(redisAddress),
-        redisSubscribers = {},
-        channelHistoryMax = 10;
+        redisSubscribers = {};
 
     function addRedisSubscriber(subscriber_key) {
         let client = new Redis(redisAddress);
@@ -52,19 +51,11 @@ const sockets = http => {
             });
         });
 
-        let get_messages = redis.zrange('messages', -1 * channelHistoryMax, -1).then(result => {
-            return result.map(x => {
-                return JSON.parse(x);
-            });
-        });
-
-        Promise.all([get_members, initialize_member, get_messages]).then(values => {
+        Promise.all([get_members, initialize_member]).then(values => {
             let members = values[0],
-                member = values[1],
-                messages = values[2];
+                member = values[1];
 
             io.emit('member_history', members);
-            io.emit('message_history', messages);
 
             redis.publish('member_add', JSON.stringify(member));
 
