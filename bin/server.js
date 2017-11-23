@@ -1,4 +1,4 @@
-const app = require('../app'),
+const app = require('../main'),
     chat = require('../libs/chat.js'),
     http = require('http').Server(app);
 
