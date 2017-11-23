@@ -2,6 +2,7 @@
   "name": "smart-telemed",
   "version": "0.0.1",
   "description": "Smart Telemed",
+  "main": "./bin/server.js",
   "scripts": {
     "start": "node ./bin/server.js"
   },
