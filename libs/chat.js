@@ -4,6 +4,8 @@ const socketio = require('socket.io'),
     moment = require('moment'),
     Redis = require('ioredis');
 
+let doctors = require('../mocks/doctors');
+
 const sockets = http => {
     let io = socketio.listen(http);
 
@@ -22,7 +24,6 @@ const sockets = http => {
         redisSubscribers[subscriber_key] = client;
     }
 
-    addRedisSubscriber('messages');
     addRedisSubscriber('member_add');
     addRedisSubscriber('member_delete');
 
@@ -42,10 +43,9 @@ const sockets = http => {
                     return members[socket.id];
                 }
 
-                let username = faker.fake("{{name.firstName}} {{name.lastName}}"),
-                    member = {
+                let member = {
                         socket: socket.id,
-                        username: username
+                        username: faker.fake("{{name.firstName}} {{name.lastName}}")
                     };
 
                 return redis.hset('members', socket.id, JSON.stringify(member))
@@ -60,14 +60,13 @@ const sockets = http => {
 
                 socket.on('send', message_text => {
                     let date = moment.now(),
-                        message = JSON.stringify({
+                        message = {
                             date: date,
                             username: member['username'],
                             message: message_text
-                        });
+                        };
 
-                    redis.zadd('messages', date, message);
-                    redis.publish('messages', message);
+                    io.emit('messages', message);
                 });
 
                 socket.on('disconnect', () => {
