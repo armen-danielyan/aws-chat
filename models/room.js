@@ -1,7 +1,7 @@
-const DB = require('../bin/database').DB;
+const DB = require('../bin/database');
 
 let Room = DB.Model.extend({
-    tableName: 'rooms',
+    tableName: 'smart-telemed.rooms',
     hasTimestamps: true,
     idAttribute: 'id'
 });

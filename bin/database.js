@@ -7,6 +7,4 @@ const knex = require('knex')({
 
 const DB = require('bookshelf')(knex);
 
-module.exports = {
-    DB: DB
-};
+module.exports = DB;

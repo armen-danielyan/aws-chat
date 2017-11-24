@@ -1,7 +1,7 @@
-const DB = require('../bin/database').DB;
+const DB = require('../bin/database');
 
 let Chat = DB.Model.extend({
-    tableName: 'chats',
+    tableName: 'smart-telemed.chats',
     hasTimestamps: true,
     idAttribute: 'id'
 });

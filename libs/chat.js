@@ -2,14 +2,149 @@ const socketio = require('socket.io'),
     faker = require('faker'),
     config = require('config'),
     moment = require('moment'),
+    _ = require('lodash'),
     Redis = require('ioredis');
 
-let doctors = require('../mocks/doctors');
+let modelChat = require('../models/chat'),
+    modelRoom = require('../models/room');
 
 const sockets = http => {
     let io = socketio.listen(http);
 
-    let redisAddress = config.get('redis').address,
+    let ioChat = io.of('/chat');
+    let userStack = {},
+        userSocket = {},
+        sendUserStack = () => {},
+        setRoom;
+
+    ioChat.on('connection', socket => {
+        console.log("socketio chat connected.");
+
+        socket.on('set-user-data', username => {
+            console.log(`${username} logged In`);
+
+            socket.username = username;
+            userSocket[socket.username] = socket.id;
+
+            socket.broadcast.emit('broadcast', {description: username + ' Logged In'});
+
+            sendUserStack = () => {
+                for (let i in userSocket) {
+                    for (let j in userStack) {
+                        if (j === i) {
+                            userStack[j] = "Online";
+                        }
+                    }
+                }
+                ioChat.emit('onlineStack', userStack);
+            }
+        });
+
+        socket.on('set-room', room => {
+            socket.leave(socket.room);
+            getRoomData(room);
+            setRoom = roomId => {
+                socket.room = roomId;
+                console.log(`roomId : ${socket.room}`);
+                socket.join(socket.room);
+                ioChat.to(userSocket[socket.username]).emit('set-room', socket.room);
+            };
+        });
+
+        socket.on('typing', () => {
+            socket.to(socket.room).broadcast.emit('typing', `${socket.username} : is typing...`);
+        });
+
+        socket.on('chat-msg', data => {
+            saveChat({
+                msgFrom: socket.username,
+                msgTo: data.msgTo,
+                msg: data.msg,
+                room: socket.room,
+                date: data.date
+            });
+
+            ioChat.to(socket.room).emit('chat-msg', {
+                msgFrom: socket.username,
+                msg: data.msg,
+                date: data.date
+            });
+        });
+
+        socket.on('disconnect', () => {
+            console.log(`${socket.username} logged out`);
+            socket.broadcast.emit('broadcast', {description: `${socket.username} Logged out`});
+            console.log("chat disconnected.");
+
+            _.unset(userSocket, socket.username);
+            userStack[socket.username] = "Offline";
+
+            ioChat.emit('onlineStack', userStack);
+        });
+    });
+
+    let saveChat = data => {
+        let newChat = new modelChat.Chat();
+        newChat.save({
+            msg_from: data.msgFrom,
+            msg_to: data.msgTo,
+            msg: data.msg,
+            room: data.room
+        })
+            .then(model => {
+                console.log("Chat Is Saved.");
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    };
+
+    let getRoomData = room => {
+        let newRoom = new modelRoom.Room();
+        newRoom.query(qb => {
+            qb.where('name1', '=', room.name1)
+                .orWhere('name1', '=', room.name2)
+                .orWhere('name2', '=', room.name1)
+                .orWhere('name2', '=', room.name2);
+        })
+            .fetch()
+            .then(model => {
+                if(!model) {
+                    newRoom
+                        .save({
+                            name1: room.name1,
+                            name2: room.name2
+                        })
+                        .then(model => {
+                            let jmodel = model.toJSON();
+                            setRoom(jmodel.id);
+                        })
+                } else {
+                    let jmodel = model.toJSON();
+                    setRoom(jmodel.id);
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*let redisAddress = config.get('redis').address,
         redis = new Redis(redisAddress),
         redisSubscribers = {};
 
@@ -77,7 +212,7 @@ const sockets = http => {
             .catch(reason => {
                 console.log('ERROR: ' + reason);
             });
-    });
+    });*/
 
     return io;
 };
