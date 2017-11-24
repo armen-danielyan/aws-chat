@@ -14,19 +14,15 @@ const sockets = http => {
     let ioChat = io.of('/chat');
     let userStack = {},
         userSocket = {},
-        sendUserStack = () => {},
-        setRoom;
+        sendUserStack = () => {
+        };
 
     ioChat.on('connection', socket => {
-        console.log("socketio chat connected.");
-
         socket.on('set-user-data', username => {
             console.log(`${username} logged In`);
 
             socket.username = username;
             userSocket[socket.username] = socket.id;
-
-            socket.broadcast.emit('broadcast', {description: username + ' Logged In'});
 
             sendUserStack = () => {
                 for (let i in userSocket) {
@@ -42,17 +38,19 @@ const sockets = http => {
 
         socket.on('set-room', room => {
             socket.leave(socket.room);
-            getRoomData(room);
-            setRoom = roomId => {
-                socket.room = roomId;
-                console.log(`roomId : ${socket.room}`);
-                socket.join(socket.room);
-                ioChat.to(userSocket[socket.username]).emit('set-room', socket.room);
-            };
+            getRoomData(room)
+                .then(roomId => {
+                    socket.room = roomId;
+                    socket.join(socket.room);
+                    ioChat.to(userSocket[socket.username]).emit('set-room', socket.room);
+                })
+                .catch(error => {
+                    console.log(error);
+                });
         });
 
         socket.on('typing', () => {
-            socket.to(socket.room).broadcast.emit('typing', `${socket.username} : is typing...`);
+            socket.to(socket.room).broadcast.emit('typing', 'is typing ...');
         });
 
         socket.on('chat-msg', data => {
@@ -92,7 +90,7 @@ const sockets = http => {
             room: data.room
         })
             .then(model => {
-                console.log("Chat Is Saved.");
+                // Reserved
             })
             .catch(error => {
                 console.log(error);
@@ -100,48 +98,37 @@ const sockets = http => {
     };
 
     let getRoomData = room => {
-        let newRoom = new modelRoom.Room();
-        newRoom.query(qb => {
-            qb.where('name1', '=', room.name1)
-                .orWhere('name1', '=', room.name2)
-                .orWhere('name2', '=', room.name1)
-                .orWhere('name2', '=', room.name2);
-        })
-            .fetch()
-            .then(model => {
-                if(!model) {
-                    newRoom
-                        .save({
-                            name1: room.name1,
-                            name2: room.name2
-                        })
-                        .then(model => {
-                            let jmodel = model.toJSON();
-                            setRoom(jmodel.id);
-                        })
-                } else {
-                    let jmodel = model.toJSON();
-                    setRoom(jmodel.id);
-                }
+        return new Promise((resolve, reject) => {
+            let newRoom = new modelRoom.Room();
+            newRoom.query(qb => {
+                qb.where('name1', '=', room.name1)
+                    .orWhere('name1', '=', room.name2)
+                    .orWhere('name2', '=', room.name1)
+                    .orWhere('name2', '=', room.name2);
             })
-            .catch(error => {
-                console.log(error);
-            });
+                .fetch()
+                .then(model => {
+                    if (!model) {
+                        newRoom
+                            .save({
+                                name1: room.name1,
+                                name2: room.name2
+                            })
+                            .then(model => {
+                                let jmodel = model.toJSON();
+                                resolve(jmodel.id);
+                            })
+                    } else {
+                        let jmodel = model.toJSON();
+                        resolve(jmodel.id);
+                    }
+                })
+                .catch(error => {
+                    reject(error);
+                });
+        });
+
     };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     /*let redisAddress = config.get('redis').address,

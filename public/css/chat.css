@@ -1,0 +1,5 @@
+#scrl2 {
+    max-height: 480px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}

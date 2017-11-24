@@ -3,48 +3,43 @@
 <head>
     <title><%= title %></title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/chat.css">
 </head>
 <body>
 
 <main>
-    <div class="container-fluid">
+    <div class="container">
+
         <input type="hidden" id="user-from" value="<%= conversation.from %>"/>
         <input type="hidden" id="user-to" value="<%= conversation.to %>"/>
-        <div class="row">
-            <div class="col-sm-4">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <h2>Chat Options</h2></div>
 
-                    <div class="panel-body" id="scrl1">
-                        <ul id="list"></ul>
-                    </div>
-                    <div class="panel-footer">
-                        <p id="typing" class="btn btn-danger btn-block btn-lg"></p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-8">
+        <div class="row">
+            <div class="col-sm-8 col-sm-offset-2">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
-                        <h4 id="frndName">Chat Room</h4>
+                        <div>
+                            <span id="frndName">Chat Room</span>
+                            <span id="typing"></span>
+                        </div>
                     </div>
                     <div class="panel-body" id="scrl2">
                         <ul id="messages"></ul>
                     </div>
                     <div class="panel-footer">
-                        <form id="chatForm" action="">
-                            <input id="myMsg" class="input-box-send" autocomplete="off"
-                                   placeholder="Write Message Here.."/>
-                            <button id="sendBtn" class="btn btn-success btn-lg">
+                        <form id="chatForm" action="" class="form-inline">
+                            <div class="form-group">
+                                <input id="myMsg" class="form-control input-box-send" autocomplete="off"
+                                       placeholder="Write Message Here.."/>
+                            </div>
+                            <button id="sendBtn" class="btn btn-success">
                                 <span class="glyphicon glyphicon-send"></span> <b>Send</b>
                             </button>
                         </form>
                     </div>
                 </div>
             </div>
-
         </div>
+
     </div>
 </main>
 
