@@ -54,9 +54,9 @@ jQuery($ => {
     });
 
     socket.on('chat-msg', data => {
-        let chatDate = moment(data.date).format("MMMM Do YYYY, hh:mm:ss a"),
+        let chatDate = moment(data.date).format("MM DD YYYY, hh:mm:ss a"),
             txt1 = $('<span></span>').text(data.msgFrom + " : ").css({"color": "#006080"}),
-            txt2 = $('<span></span>').text(chatDate).css({"float": "right", "color": "#a6a6a6", "font-size": "16px"}),
+            txt2 = $('<span></span>').text(chatDate).css({"float": "right", "color": "#a6a6a6", "font-size": "12px"}),
             txt3 = $('<p></p>').append(txt1, txt2),
             txt4 = $('<p></p>').text(data.msg).css({"color": "#000000"});
 

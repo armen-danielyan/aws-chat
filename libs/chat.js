@@ -82,7 +82,7 @@ const sockets = http => {
     });
 
     let saveChat = data => {
-        let newChat = new modelChat.Chat();
+        let newChat = new modelChat();
         newChat.save({
             msg_from: data.msgFrom,
             msg_to: data.msgTo,
@@ -99,7 +99,7 @@ const sockets = http => {
 
     let getRoomData = room => {
         return new Promise((resolve, reject) => {
-            let newRoom = new modelRoom.Room();
+            let newRoom = new modelRoom();
             newRoom.query(qb => {
                 qb.where('name1', '=', room.name1)
                     .orWhere('name1', '=', room.name2)

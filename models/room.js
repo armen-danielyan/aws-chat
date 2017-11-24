@@ -6,11 +6,4 @@ let Room = DB.Model.extend({
     idAttribute: 'id'
 });
 
-let Rooms = DB.Collection.extend({
-    model: Room
-});
-
-module.exports = {
-    Room: Room,
-    Rooms: Rooms
-};
+module.exports = Room;

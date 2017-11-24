@@ -6,11 +6,4 @@ let Chat = DB.Model.extend({
     idAttribute: 'id'
 });
 
-let Chats = DB.Collection.extend({
-    model: Chat
-});
-
-module.exports = {
-    Chat: Chat,
-    Chats: Chats
-};
+module.exports = Chat;
