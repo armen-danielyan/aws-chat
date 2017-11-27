@@ -20,7 +20,7 @@ const sockets = http => {
             console.log(`${username} logged In`);
 
             socket.username = username;
-            userSocket[socket.username] = socket.id;
+            userSocket[username] = socket.id;
 
             sendUserStack();
         });
@@ -48,6 +48,14 @@ const sockets = http => {
             socket.to(socket.room).broadcast.emit('typing', 'is typing ...');
         });
 
+        socket.on('delivered', data => {
+            socket.to(socket.room).broadcast.emit('set-delivered', data);
+        });
+
+        socket.on('seen', data => {
+            socket.to(socket.room).broadcast.emit('set-seen', data);
+        });
+
         socket.on('chat-msg', data => {
             saveChat({
                 msgFrom: socket.username,
@@ -55,13 +63,18 @@ const sockets = http => {
                 msg: data.msg,
                 room: socket.room,
                 date: data.date
-            });
-
-            ioChat.to(socket.room).emit('chat-msg', {
-                msgFrom: socket.username,
-                msg: data.msg,
-                date: data.date
-            });
+            })
+                .then(msgId => {
+                    ioChat.to(socket.room).emit('chat-msg', {
+                        msgFrom: socket.username,
+                        msg: data.msg,
+                        msgId: msgId,
+                        date: data.date
+                    });
+                })
+                .catch(error => {
+                    console.log(error);
+                });
         });
 
         socket.on('disconnect', () => {
@@ -89,19 +102,23 @@ const sockets = http => {
     };
 
     let saveChat = data => {
-        let newChat = new modelChat();
-        newChat.save({
-            msg_from: data.msgFrom,
-            msg_to: data.msgTo,
-            msg: data.msg,
-            room: data.room
-        })
-            .then(model => {
-                // Reserved
-            })
-            .catch(error => {
-                console.log(error);
-            });
+        return new Promise((resolve, reject) => {
+            new modelChat()
+                .save({
+                    msg_from: data.msgFrom,
+                    msg_to: data.msgTo,
+                    msg: data.msg,
+                    room: data.room
+                })
+                .then(model => {
+                    let jmodel = model.toJSON();
+                    resolve(jmodel.id);
+                })
+                .catch(error => {
+                    reject(error);
+                });
+        });
+
     };
 
     let getRoomData = room => {

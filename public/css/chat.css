@@ -4,8 +4,13 @@
     overflow-x: hidden;
 }
 
+#messages {
+    padding: 0;
+}
+
 #messages li {
     list-style-type: none;
+    padding: 10px;
 }
 
 #messages li .datetime {
@@ -19,4 +24,10 @@
     position: fixed;
     left: 10px;
     bottom: 10px;
+}
+
+#msg-status {
+    text-align: right;
+    font-size: 12px;
+    margin: -5px;
 }

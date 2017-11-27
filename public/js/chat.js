@@ -1,6 +1,9 @@
 jQuery($ => {
     const socket = io('/chat');
 
+    let hasNewMessage = false,
+        lastMessageId;
+
     let username = $('#user-from').val(),
     toUser = $('#user-to').val();
 
@@ -54,22 +57,6 @@ jQuery($ => {
         }, 4000);
     });
 
-    socket.on('status', data => {
-        console.log(data);
-        if(data.user === toUser) {
-
-            if(data.status === 'Online') {
-                $("#status").css("color", "green");
-
-                $("#test").html(text1 + "Joind!");
-            } else {
-                $("#status").css("color", "red");
-
-                $("#alert .user-message").html(text1 + "Left!");
-            }
-        }
-    });
-
     $('form').submit(() => {
         socket.emit('chat-msg', {msg: $('#myMsg').val(), msgTo: toUser, date: Date.now()});
         $('#myMsg').val("");
@@ -78,15 +65,34 @@ jQuery($ => {
     });
 
     socket.on('chat-msg', data => {
+        hasNewMessage = true;
         let chatDate = moment(data.date).format("MM DD YYYY, hh:mm:ss a"),
             txt1 = $('<span></span>').text(data.msgFrom + " : "),
             txt2 = $('<span></span>').text(chatDate).attr("class", "datetime"),
             txt3 = $('<p></p>').append(txt1, txt2),
             txt4 = $('<p></p>').text(data.msg);
 
-        $('#messages').append($('<li>').append(txt3, txt4));
+        $('#messages').append($('<li>').append(txt3, txt4).attr("id", "msg" + data.msgId));
         $('#typing').text("");
         $('#scrl2').scrollTop($('#scrl2').prop("scrollHeight"));
+        lastMessageId = data.msgId;
+        socket.emit("delivered", data.msgId);
+    });
+
+    socket.on("set-delivered", data => {
+        $("#msg" + data).css("background-color", "#eee");
+    });
+
+    socket.on("set-seen", data => {
+        let chatDate = moment(data.date).format("hh:mm:ss a");
+        $("#msg-status").html("Seen " + chatDate);
+    });
+
+    $(window).focus(() => {
+        if(hasNewMessage) {
+            socket.emit("seen", lastMessageId);
+            hasNewMessage = false;
+        }
     });
 
     socket.on('disconnect', () => {
