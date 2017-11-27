@@ -37,7 +37,6 @@ const sockets = http => {
                     socket.room = roomId;
                     socket.join(socket.room);
                     return ioChat.to(userSocket[username]).emit('set-room', socket.room);
-
                 })
                 .catch(error => {
                     console.log(error);
@@ -79,7 +78,6 @@ const sockets = http => {
 
         socket.on('disconnect', () => {
             console.log(`${socket.username} logged out`);
-            socket.broadcast.emit('broadcast', {description: `${socket.username} Logged out`});
             console.log("chat disconnected.");
 
             _.unset(userSocket, socket.username);
@@ -228,4 +226,6 @@ const sockets = http => {
     return io;
 };
 
-module.exports = {sockets: sockets};
+module.exports = {
+    sockets: sockets
+};
