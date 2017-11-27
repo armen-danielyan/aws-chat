@@ -3,3 +3,20 @@
     overflow-y: scroll;
     overflow-x: hidden;
 }
+
+#messages li {
+    list-style-type: none;
+}
+
+#messages li .datetime {
+    float: right;
+    color: #a6a6a6;
+    font-size: 12px;
+}
+
+#alert {
+    display: none;
+    position: fixed;
+    left: 10px;
+    bottom: 10px;
+}

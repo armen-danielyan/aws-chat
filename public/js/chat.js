@@ -10,7 +10,18 @@ jQuery($ => {
     });
 
     socket.on('onlineStack', stack => {
-        console.log(stack);
+        let text1 = "<strong>" + toUser + "</strong> ";
+        $("#alert").show();
+        if(stack[toUser] === 'Online') {
+            $("#status").css("color", "green");
+            $("#alert .user-message").html(text1 + "Joined!");
+        } else {
+            $("#status").css("color", "red");
+            $("#alert .user-message").html(text1 + "Left!");
+        }
+        setTimeout(() => {
+            $("#alert").fadeOut();
+        }, 3000)
     });
 
     function createRoom() {
@@ -22,10 +33,7 @@ jQuery($ => {
         $('#chatForm').show();
         $('#sendBtn').hide();
 
-        let currentRoom = username + "-" + toUser,
-            reverseRoom = toUser + "-" + username;
-
-        socket.emit('set-room', {name1: currentRoom, name2: reverseRoom});
+        socket.emit('set-room', toUser);
     }
 
     $('#myMsg').keyup(() => {
@@ -46,6 +54,22 @@ jQuery($ => {
         }, 4000);
     });
 
+    socket.on('status', data => {
+        console.log(data);
+        if(data.user === toUser) {
+
+            if(data.status === 'Online') {
+                $("#status").css("color", "green");
+
+                $("#test").html(text1 + "Joind!");
+            } else {
+                $("#status").css("color", "red");
+
+                $("#alert .user-message").html(text1 + "Left!");
+            }
+        }
+    });
+
     $('form').submit(() => {
         socket.emit('chat-msg', {msg: $('#myMsg').val(), msgTo: toUser, date: Date.now()});
         $('#myMsg').val("");
@@ -55,10 +79,10 @@ jQuery($ => {
 
     socket.on('chat-msg', data => {
         let chatDate = moment(data.date).format("MM DD YYYY, hh:mm:ss a"),
-            txt1 = $('<span></span>').text(data.msgFrom + " : ").css({"color": "#006080"}),
-            txt2 = $('<span></span>').text(chatDate).css({"float": "right", "color": "#a6a6a6", "font-size": "12px"}),
+            txt1 = $('<span></span>').text(data.msgFrom + " : "),
+            txt2 = $('<span></span>').text(chatDate).attr("class", "datetime"),
             txt3 = $('<p></p>').append(txt1, txt2),
-            txt4 = $('<p></p>').text(data.msg).css({"color": "#000000"});
+            txt4 = $('<p></p>').text(data.msg);
 
         $('#messages').append($('<li>').append(txt3, txt4));
         $('#typing').text("");

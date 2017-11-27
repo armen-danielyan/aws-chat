@@ -10,12 +10,10 @@ let modelChat = require('../models/chat'),
 
 const sockets = http => {
     let io = socketio.listen(http);
-
     let ioChat = io.of('/chat');
+
     let userStack = {},
-        userSocket = {},
-        sendUserStack = () => {
-        };
+        userSocket = {};
 
     ioChat.on('connection', socket => {
         socket.on('set-user-data', username => {
@@ -24,25 +22,22 @@ const sockets = http => {
             socket.username = username;
             userSocket[socket.username] = socket.id;
 
-            sendUserStack = () => {
-                for (let i in userSocket) {
-                    for (let j in userStack) {
-                        if (j === i) {
-                            userStack[j] = "Online";
-                        }
-                    }
-                }
-                ioChat.emit('onlineStack', userStack);
-            }
+            sendUserStack();
         });
 
-        socket.on('set-room', room => {
+        socket.on('set-room', toUser => {
             socket.leave(socket.room);
-            getRoomData(room)
+
+            let username = socket.username,
+                currentRoom = username + "-" + toUser,
+                reverseRoom = toUser + "-" + username;
+
+            getRoomData({name1: currentRoom, name2: reverseRoom})
                 .then(roomId => {
                     socket.room = roomId;
                     socket.join(socket.room);
-                    ioChat.to(userSocket[socket.username]).emit('set-room', socket.room);
+                    return ioChat.to(userSocket[username]).emit('set-room', socket.room);
+
                 })
                 .catch(error => {
                     console.log(error);
@@ -80,6 +75,18 @@ const sockets = http => {
             ioChat.emit('onlineStack', userStack);
         });
     });
+
+    let sendUserStack = () => {
+        for (let i in userSocket) {
+            for (let j in userStack) {
+                if (j === i) {
+                    userStack[j] = "Online";
+                }
+            }
+        }
+
+        ioChat.emit('onlineStack', userStack);
+    };
 
     let saveChat = data => {
         let newChat = new modelChat();
